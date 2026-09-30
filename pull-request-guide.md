@@ -10,6 +10,47 @@ Pull Request는 분산 버전 관리에서 다른 개발자의 저장소에 변�
 
 오늘날 PR은 단순한 병합 요청을 넘어 변경 이유와 검증 결과를 기록하고, 리뷰어의 의견을 반영하며, CI/CD 검사 결과를 함께 확인하는 협업 단위로 사용됩니다.
 
+## Pull Request 진행 과정
+
+```mermaid
+sequenceDiagram
+	actor Developer as 개발자
+	participant Remote as 원격 저장소
+	participant Reviewer as 리뷰어
+	participant CI as CI 검사
+
+	Developer->>Developer: 기본 브랜치에서 작업 브랜치 생성
+	Developer->>Developer: 코드 작성 및 커밋
+	Developer->>Remote: 작업 브랜치 push
+	Developer->>Remote: Pull Request 생성
+	Remote->>CI: 자동 검사 실행
+	Remote->>Reviewer: 리뷰 요청
+	CI-->>Remote: 검사 결과 전달
+	Reviewer->>Remote: 변경 내용 검토
+
+	alt 수정이 필요한 경우
+		Reviewer-->>Developer: 리뷰 의견 전달
+		Developer->>Developer: 코드 수정 및 추가 커밋
+		Developer->>Remote: 변경 사항 push
+		Remote->>CI: 자동 검사 재실행
+		Remote->>Reviewer: 수정 내용 재검토 요청
+		Reviewer->>Remote: 리뷰 결과 갱신
+	else 승인 및 검사 통과
+		Reviewer-->>Remote: PR 승인
+	end
+
+	opt 병합 전에 충돌이 발생한 경우
+		Remote-->>Developer: 충돌 알림
+		Developer->>Developer: 기본 브랜치 변경 사항 반영 및 충돌 해결
+		Developer->>Remote: 해결 결과 push
+		Remote->>CI: 자동 검사 재실행
+	end
+
+	Remote->>Remote: Pull Request 병합
+	Remote-->>Developer: 병합 완료 알림
+	Developer->>Remote: 기본 브랜치 최신 내용 pull
+```
+
 ## 단계별 예시
 
 ### 1. 기본 브랜치에서 작업 브랜치 만들기
